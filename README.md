@@ -7,7 +7,11 @@ The agent must define an in-progress task (`tilldone toggle`) before it can use 
 ## Requirements
 
 - [pi](https://github.com/earendil-works/pi) coding agent
-- [beads](https://github.com/gastownhall/beads) CLI (`bd`) available on `$PATH`
+- The beads CLI (`bd`) on `$PATH` — this is the **`@beads/bd`** npm package, installed globally:
+  ```
+  npm install -g @beads/bd
+  ```
+  Only `bd` from `@beads/bd` is used (this extension shells out to it). There are several *other* beads-named packages on npm (`beads-ui`, `@herbcaudill/beads-ui`, `pm-beads`, the `beads` package, and AI-tool integrations like `opencode-beads`) — none of those provide the `bd` CLI and none are required. If in doubt, check: `bd --version` should print a version number.
 
 ## Install
 
