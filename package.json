@@ -1,6 +1,6 @@
 {
   "name": "tilldone-bd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Work-till-it's-done task discipline for pi, backed by the beads (bd) issue tracker: define a task before using tools, and get nudged to finish it.",
   "keywords": [
     "pi-package",
