@@ -933,7 +933,9 @@ export default function (pi: ExtensionAPI) {
 					const added = tasks.filter((t) => t.ref && a_refs.includes(t.ref));
 					const a_failed = items.length - a_refs.length;
 					const msg = added.length === 0
-						? "No tasks added (bd failed)."
+						? a_refs.length > 0
+							? `No tasks added (bd failed): created ${a_refs.length} (${a_refs.join(", ")}) but the label lookup returned none - store: ${s_storeRoot ?? "?"}, label: ${s_label}, bd error: ${s_lastBdError ?? "none"}.`
+							: "No tasks added (bd failed)."
 						: added.length === 1
 							? `Added task #${added[0].id}: ${added[0].text}`
 							: `Added ${added.length} tasks: ${added.map((t) => `#${t.id}`).join(", ")}`;
