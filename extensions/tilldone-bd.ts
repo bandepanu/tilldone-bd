@@ -190,6 +190,7 @@ export default function (pi: ExtensionAPI) {
 	let listTitle: string | undefined;
 	let listDescription: string | undefined;
 	let nudgedThisCycle = false;
+	let s_lastNudgedSignature = "";
 
 	// ── beads (bd) backend ────────────────────────────────────────────
 
@@ -738,10 +739,11 @@ export default function (pi: ExtensionAPI) {
 	// ── Blocking gate ──────────────────────────────────────────────────
 	// Only blocks write/execute tools. Read-only tools (read, grep, find,
 	// ls, glob) are always allowed so agents can explore before planning.
-	// Subagent tools and dispatch tools are also whitelisted.
+	// Subagent tools, dispatch tools, and non-mutating memory/session/docx tools are also whitelisted.
 
 	const READ_ONLY_TOOLS = new Set([
 		"read", "grep", "find", "ls", "glob",
+		"memory_search", "session_search", "docx_validate",
 		"query_experts",
 		"subagent_create", "subagent_continue", "subagent_list", "subagent_remove",
 		"dispatch_agent",
@@ -786,9 +788,17 @@ export default function (pi: ExtensionAPI) {
 
 	pi.on("agent_end", async (_event, _ctx) => {
 		const incomplete = tasks.filter((t) => t.status !== "done");
-		if (incomplete.length === 0 || nudgedThisCycle) return;
+		if (incomplete.length === 0) {
+			s_lastNudgedSignature = "";
+			return;
+		}
+		if (nudgedThisCycle) return;
+
+		const s_signature = incomplete.map((t) => `${t.id}:${t.status}`).join("|");
+		if (s_signature === s_lastNudgedSignature) return;
 
 		nudgedThisCycle = true;
+		s_lastNudgedSignature = s_signature;
 
 		const taskList = incomplete
 			.map((t) => `  ${STATUS_ICON[t.status]} #${t.id} [${STATUS_LABEL[t.status]}]: ${t.text}`)
@@ -797,7 +807,7 @@ export default function (pi: ExtensionAPI) {
 		pi.sendMessage(
 			{
 				customType: "tilldone-nudge",
-				content: `⚠️ You still have ${incomplete.length} incomplete task(s):\n\n${taskList}\n\nEither continue working on them or mark them done with \`tilldone toggle\`. Don't stop until it's done!`,
+				content: `⚠️ You still have ${incomplete.length} incomplete task(s):\n\n${taskList}\n\nEither continue working on them or mark them done with \`tilldone toggle\`.`,
 				display: true,
 			},
 			{ triggerTurn: true },
