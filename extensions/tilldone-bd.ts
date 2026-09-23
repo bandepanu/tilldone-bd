@@ -739,15 +739,12 @@ export default function (pi: ExtensionAPI) {
 	// ── Blocking gate ──────────────────────────────────────────────────
 	// Only blocks write/execute tools. Read-only tools (read, grep, find,
 	// ls, glob) are always allowed so agents can explore before planning.
-	// Subagent tools, dispatch tools, and non-mutating memory/session/docx tools are also whitelisted.
+	// Non-mutating memory/session/docx tools and subagent result/steer controls are whitelisted. Dispatch tools (Agent/SubagentWorkflow) stay gated so delegation still needs a defined task.
 
 	const READ_ONLY_TOOLS = new Set([
 		"read", "grep", "find", "ls", "glob",
 		"memory_search", "session_search", "docx_validate",
-		"query_experts",
-		"subagent_create", "subagent_continue", "subagent_list", "subagent_remove",
-		"dispatch_agent",
-		"run_chain",
+		"get_subagent_result", "steer_subagent",
 	]);
 
 	pi.on("tool_call", async (event, _ctx) => {
